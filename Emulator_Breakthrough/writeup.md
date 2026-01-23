@@ -53,30 +53,20 @@ The initial approach focused on identifying the VM's core components through sta
 Using Ghidra's decompiler, I located the **Fetch-Decode-Execute** loop—the heart of any emulator. The pattern was recognizable:
 
 ```c
-while (instruction_pointer < code_size) {
-    // Fetch: Read 3-byte instruction
-    instruction = *(uint24_t *)(code_base + ip * 3);
-    
-    // Decode: Extract components
-    opcode = extract_opcode(instruction);
-    arg1 = extract_arg1(instruction);
-    arg2 = extract_arg2(instruction);
-    
-    // Execute: Dispatch to handler
-    switch(opcode) {
-        case IMM_OPCODE: /* ... */ break;
-        case ADD_OPCODE: /* ... */ break;
-        // ...
-    }
-    
-    ip++;
-}
+  byte bVar1;
+  
+  do {
+    bVar1 = *(byte *)(param_1 + 0x405);
+    *(byte *)(param_1 + 0x405) = bVar1 + 1;
+    interpret_instructions(param_1,(ulong)*(uint3 *)((long)(int)(uint)bVar1 * 3 + param_1));
+  } while( true );
+
 ```
 
 **Key Discovery**: The VM state structure maintains registers at **fixed offsets** from a base pointer. For example:
 - `vm_state + 0x400` → Register A
-- `vm_state + 0x408` → Stack Pointer
-- `vm_state + 0x410` → Instruction Pointer
+- `vm_state + 0x405` → Stack Pointer
+- `vm_state + 0x406` → Instruction Pointer
 
 However, these offset mappings change between challenge iterations, requiring dynamic discovery.
 
@@ -444,3 +434,4 @@ Most importantly, this challenge reinforced that **every program has an attack s
 **Date**: January 2026  
 **Challenge**: pwn.college - Yan85 Series (yansanity-hard)  
 **Tools**: Ghidra 10.x, GDB, Python 3.x, pwntools
+
