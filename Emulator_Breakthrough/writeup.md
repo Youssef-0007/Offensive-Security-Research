@@ -432,6 +432,7 @@ Most importantly, this challenge reinforced that **every program has an attack s
 
 **Author**: [Youssef Hasan]  
 **Date**: January 2026  
-**Challenge**: pwn.college - Yan85 Series (yansanity-hard)  
+**Challenge**: pwn.college - Yan85 Series 
 **Tools**: Ghidra 10.x, GDB, Python 3.x, pwntools
+
 
