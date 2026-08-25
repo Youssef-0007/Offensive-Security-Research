@@ -62,6 +62,16 @@ A custom virtual machine with a fully randomized ISA — opcodes, register encod
 
 ---
 
+### [Ghost Page: Locating Erased Memory via Prefetch Side-Channel and Exfiltrating Through Exit Status](Write-ups/prefetch-side-channel/)
+
+> `Microarchitectural Attack` · `Side-Channel` · `x86-64 Assembly` · `ASLR Bypass`
+
+A page is allocated at a randomized address, a secret written into it, then every pointer zeroed — no surviving references anywhere in the process. Injected shellcode has access to one syscall only: `exit`. The attack locates the erased page using `prefetcht2` timing discrimination (28× amplified, with signal inversion accounted for), verifies it via known-prefix comparison, and exfiltrates contents one byte at a time through the process exit code. Parallel retry workers handle measurement noise without hardening single-shot reliability.
+
+**Core insight:** `prefetcht2` does not fault on unmapped addresses — but it still triggers address translation. That translation cost is the side channel.
+
+---
+
 ## Blogs
 
 > 🔧 **Coming soon** — concept-focused writing on vulnerability classes, cryptographic failures, and exploitation techniques. Each post will explore the *why* behind the attacks documented in the writeups above.
@@ -80,6 +90,7 @@ offensive-security-research/
 │   ├── anti-automation-bypass/
 │   ├── chain-reaction-secure-chat/
 │   └── emulator-breakthrough/
+│   └── prefetch-side-channel/
 │
 └── blogs/                          ← coming soon
 ```
