@@ -22,6 +22,36 @@ Every writeup is structured around four questions:
 
 ## Writeups
 
+### [Crossing the Page-Table Boundary: A Cross-Process Meltdown Attack via Kernel Pointer Disclosure](Write-ups/cross-process-meltdown/)
+
+> `Kernel Exploitation` · `Microarchitectural Attack` · `x86-64 Assembly` · `Meltdown` · `KPTI`
+
+A victim's secret sits in a userspace buffer at a known virtual address — but that address means nothing outside the victim's own page tables. A kernel pointer leak exposes the victim's `task_struct`. From there, Meltdown is repurposed as a generic kernel-memory oracle, walking `task_struct → mm_struct → PGD` by hand, then performing a full four-level page-table walk to recover the physical address of the secret. The physical address is converted back to a kernel virtual address via the direct map, and the secret is read byte by byte through a Flush+Reload cache-timing covert channel.
+
+**Core insight:** The fault handler fires exactly as designed — a few cycles too late. The kernel's own bookkeeping becomes the path back to the secret it was protecting.
+
+---
+
+### [Ghost Page: Locating Erased Memory via Prefetch Side-Channel and Exfiltrating Through Exit Status](Write-ups/prefetch-side-channel/)
+
+> `Microarchitectural Attack` · `Side-Channel` · `x86-64 Assembly` · `ASLR Bypass`
+
+A page is allocated at a randomized address, a secret written into it, then every pointer zeroed — no surviving references anywhere in the pr>
+
+**Core insight:** `prefetcht2` does not fault on unmapped addresses — but it still triggers address translation. That translation cost is the>
+
+---
+
+### [Emulator Breakthrough: Reverse Engineering a Randomized Virtual Machine](Write-ups/emulator-breakthrough/)
+
+> `Reverse Engineering` · `VM Exploitation` · `ISA Reconstruction` · `Toolchain Development`
+
+A custom virtual machine with a fully randomized ISA — opcodes, register encodings, and instruction byte ordering all shuffled per instance. >
+
+**Core insight:** The exit code is an information disclosure channel. Every interface is an attack surface.
+
+---
+
 ### [Advanced Memory Corruption: A Multi-Stage Binary Exploitation Case Study](Write-ups/memory-corruption-multi-stage/)
 
 > `Binary Exploitation` · `PIE` · `Stack Canary` · `NX` · `Partial RELRO`
@@ -52,26 +82,6 @@ A five-stage attack chain across completely different vulnerability classes. SQL
 
 ---
 
-### [Emulator Breakthrough: Reverse Engineering a Randomized Virtual Machine](Write-ups/emulator-breakthrough/)
-
-> `Reverse Engineering` · `VM Exploitation` · `ISA Reconstruction` · `Toolchain Development`
-
-A custom virtual machine with a fully randomized ISA — opcodes, register encodings, and instruction byte ordering all shuffled per instance. The exit syscall leaks internal register state through the process exit code, creating an oracle that reconstructs the entire ISA in 336 targeted probes instead of 393,216 blind attempts. A purpose-built assembler, disassembler, and interpreter were developed to write and verify multi-stage payloads under severe register constraints.
-
-**Core insight:** The exit code is an information disclosure channel. Every interface is an attack surface.
-
----
-
-### [Ghost Page: Locating Erased Memory via Prefetch Side-Channel and Exfiltrating Through Exit Status](Write-ups/prefetch-side-channel/)
-
-> `Microarchitectural Attack` · `Side-Channel` · `x86-64 Assembly` · `ASLR Bypass`
-
-A page is allocated at a randomized address, a secret written into it, then every pointer zeroed — no surviving references anywhere in the process. Injected shellcode has access to one syscall only: `exit`. The attack locates the erased page using `prefetcht2` timing discrimination (28× amplified, with signal inversion accounted for), verifies it via known-prefix comparison, and exfiltrates contents one byte at a time through the process exit code. Parallel retry workers handle measurement noise without hardening single-shot reliability.
-
-**Core insight:** `prefetcht2` does not fault on unmapped addresses — but it still triggers address translation. That translation cost is the side channel.
-
----
-
 ## Blogs
 
 > 🔧 **Coming soon** — concept-focused writing on vulnerability classes, cryptographic failures, and exploitation techniques. Each post will explore the *why* behind the attacks documented in the writeups above.
@@ -91,6 +101,7 @@ offensive-security-research/
 │   ├── chain-reaction-secure-chat/
 │   └── emulator-breakthrough/
 │   └── prefetch-side-channel/
+│   └── cross-process-meltdown/
 │
 └── blogs/                          ← coming soon
 ```
@@ -106,6 +117,7 @@ offensive-security-research/
 | **Cryptanalysis** | AES-ECB block-matching oracle, Diffie-Hellman parameter manipulation, hash brute-force against constrained input spaces |
 | **Web Exploitation** | SQL injection, stored XSS, browser-as-attack-vector |
 | **Exploit Development** | Multi-stage chains, pwntools, position-independent shellcode, register-constrained payloads |
+| **Kernel Exploitation** | Kernel pointer disclosure · manual page-table walk · direct-map remapping · KPTI bypass conditions |
 
 ---
 
@@ -120,4 +132,4 @@ Offensive Security · Vulnerability Research · Secure Systems
 
 ---
 
-*All research conducted in authorized environments for educational and professional development purposes.*
+*All write-ups conducted in authorized environments for educational and professional development purposes.*
