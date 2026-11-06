@@ -42,6 +42,16 @@ A page is allocated at a randomized address, a secret written into it, then ever
 
 ---
 
+### [From Userspace Overflow to Protected File Disclosure: Exploiting a Kernel-Hosted Virtual Machine](writeups/kernel-vm-userspace-to-file-disclosure/)
+
+> `Kernel Exploitation` · `TOCTOU` · `Binary Exploitation` · `Race Condition`
+
+A stack overflow in a userspace client becomes full protected-file disclosure through four chained stages: a reconnect-per-guess oracle that leaks the canary and PIE base byte by byte, a control-flow hijack into native shellcode, a TOCTOU race against a kernel-hosted VM's own instruction validator, and a file-offset trick that empties a protected file's delimiters so its content slips past the module's own filter undetected.
+
+**Core insight:** Neither a kernel address leak nor direct `struct file` manipulation is required. `write()` already advances the file offset as an ordinary side effect — the subsequent read simply starts from wherever that left it, and the content filter never sees the bytes it's looking for.
+
+---
+
 ### [Emulator Breakthrough: Reverse Engineering a Randomized Virtual Machine](Write-ups/emulator-breakthrough/)
 
 > `Reverse Engineering` · `VM Exploitation` · `ISA Reconstruction` · `Toolchain Development`
@@ -102,6 +112,7 @@ offensive-security-research/
 │   └── emulator-breakthrough/
 │   └── prefetch-side-channel/
 │   └── cross-process-meltdown/
+│   └── kernel-vm-userspace-to-file-disclosure/
 │
 └── blogs/                          ← coming soon
 ```
@@ -118,7 +129,7 @@ offensive-security-research/
 | **Web Exploitation** | SQL injection, stored XSS, browser-as-attack-vector |
 | **Exploit Development** | Multi-stage chains, pwntools, position-independent shellcode, register-constrained payloads |
 | **Kernel Exploitation** | Kernel pointer disclosure · manual page-table walk · direct-map remapping · KPTI bypass conditions |
-
+| **Race Conditions** | TOCTOU exploitation against shared, writable validator state · reconnect-per-guess oracles |
 ---
 
 ## Contact
